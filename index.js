@@ -315,6 +315,8 @@ function initializeWebSocketServer(server) {
 
             logStream.on('data', chunk => {
                 ws.send(chunk.toString());
+                // Display log container
+                // console.log(chunk.toString());
             });
 
             ws.on('message', (msg) => {
