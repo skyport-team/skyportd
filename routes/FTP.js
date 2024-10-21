@@ -76,8 +76,23 @@ const watchVolumesDirectory = () => {
   }, 5000);
 };
 
+const ensureDirectoryExists = async (dir) => {
+  try {
+    await fs.access(dir);
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      await fs.mkdir(dir, { recursive: true });
+      log.info(`${dir} folder created successfully`);
+    } else {
+      throw err;
+    }
+  }
+};
+
 const initializeUsers = async () => {
-  await fs.mkdir(dataContainerDir, { recursive: true });
+  await ensureDirectoryExists(dataContainerDir);
+  await ensureDirectoryExists(volumesDir);
+
   const directories = await getDirectories(volumesDir);
 
   await Promise.all(directories.map(async (dir) => {
@@ -96,6 +111,7 @@ const initializeUsers = async () => {
     }
   }));
 };
+
 
 initializeUsers();
 
