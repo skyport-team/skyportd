@@ -374,8 +374,8 @@ function initializeWebSocketServer(server) {
                 const stream = await container.attach({
                     stream: true,
                     stdin: true,
-                    stdout: true,
-                    stderr: true,
+                    stdout: false, // doesn't use stdout
+                    stderr: false,  // doesn't use stderr
                     hijack: true
                 });
         
@@ -392,7 +392,7 @@ function initializeWebSocketServer(server) {
                     log.error('Attach stream error:', err);
                     ws.send(`Error in attach stream: ${err.message}`);
                 });
-        
+                
                 // Write the command to the stream
                 stream.write(command + '\n'); // your not disattaching.
         
@@ -401,7 +401,7 @@ function initializeWebSocketServer(server) {
                 ws.send(`Failed to attach to container: ${err.message}`);
             }
         }
-
+        
         async function performPowerAction(ws, container, action) {
             const actionMap = {
                 'start': container.start.bind(container),
