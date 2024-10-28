@@ -34,10 +34,10 @@ const chalk = require('chalk')
 const fs2 = require('fs').promises;
 const ascii = fs.readFileSync('./handlers/ascii.txt', 'utf8');
 const { exec } = require('child_process');
-const { start, createNewVolume } = require('./routes/FTP.js')
-const { createDatabaseAndUser } = require('./routes/Database.js');
+const { start, createNewVolume } = require('./handlers/ftp.js')
+const { createDatabaseAndUser } = require('./handlers/database.js');
 const config = require('./config.json');
-const statsLogger = require('./routes/Stats.js');
+const statsLogger = require('./handlers/stats.js');
 
 const docker = new Docker({ socketPath: process.env.dockerSocket });
 
@@ -66,12 +66,11 @@ async function init() {
                 process.exit()
             }
         })
-        log.init('init done')
 
         const volumesPath = path.join(__dirname, '../volumes');
         await fs2.mkdir(volumesPath, { recursive: true });
 
-        log.init('volumes folder created successfully');
+        log.info('volumes folder created successfully');
 
         // Node Stats
         statsLogger.initLogger();
