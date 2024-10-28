@@ -1,1 +1,681 @@
-[]
+[
+  {
+    "timestamp": "2024-10-28T18:30:12.300Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7030.37 MB",
+    "CoresMax": 8,
+    "Cores": "3.50%"
+  },
+  {
+    "timestamp": "2024-10-28T18:30:22.304Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7149.89 MB",
+    "CoresMax": 8,
+    "Cores": "4.78%"
+  },
+  {
+    "timestamp": "2024-10-28T18:30:32.313Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7126.73 MB",
+    "CoresMax": 8,
+    "Cores": "2.87%"
+  },
+  {
+    "timestamp": "2024-10-28T18:30:42.318Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7278.43 MB",
+    "CoresMax": 8,
+    "Cores": "2.73%"
+  },
+  {
+    "timestamp": "2024-10-28T18:30:52.326Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7429.85 MB",
+    "CoresMax": 8,
+    "Cores": "2.10%"
+  },
+  {
+    "timestamp": "2024-10-28T18:31:02.341Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7317.79 MB",
+    "CoresMax": 8,
+    "Cores": "2.31%"
+  },
+  {
+    "timestamp": "2024-10-28T18:31:12.344Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7207.88 MB",
+    "CoresMax": 8,
+    "Cores": "7.57%"
+  },
+  {
+    "timestamp": "2024-10-28T18:31:22.346Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7245.70 MB",
+    "CoresMax": 8,
+    "Cores": "1.56%"
+  },
+  {
+    "timestamp": "2024-10-28T18:31:32.359Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7238.49 MB",
+    "CoresMax": 8,
+    "Cores": "5.16%"
+  },
+  {
+    "timestamp": "2024-10-28T18:31:42.365Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6917.76 MB",
+    "CoresMax": 8,
+    "Cores": "0.59%"
+  },
+  {
+    "timestamp": "2024-10-28T18:31:52.379Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6973.43 MB",
+    "CoresMax": 8,
+    "Cores": "0.20%"
+  },
+  {
+    "timestamp": "2024-10-28T18:32:02.384Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6873.38 MB",
+    "CoresMax": 8,
+    "Cores": "0.77%"
+  },
+  {
+    "timestamp": "2024-10-28T18:32:12.386Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7000.02 MB",
+    "CoresMax": 8,
+    "Cores": "3.30%"
+  },
+  {
+    "timestamp": "2024-10-28T18:32:22.392Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7036.43 MB",
+    "CoresMax": 8,
+    "Cores": "4.97%"
+  },
+  {
+    "timestamp": "2024-10-28T18:32:34.677Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7074.86 MB",
+    "CoresMax": 8,
+    "Cores": "1.14%"
+  },
+  {
+    "timestamp": "2024-10-28T18:32:44.688Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6986.70 MB",
+    "CoresMax": 8,
+    "Cores": "2.12%"
+  },
+  {
+    "timestamp": "2024-10-28T18:32:54.698Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6842.11 MB",
+    "CoresMax": 8,
+    "Cores": "1.16%"
+  },
+  {
+    "timestamp": "2024-10-28T18:33:04.707Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6886.29 MB",
+    "CoresMax": 8,
+    "Cores": "0.96%"
+  },
+  {
+    "timestamp": "2024-10-28T18:33:14.713Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6899.76 MB",
+    "CoresMax": 8,
+    "Cores": "2.34%"
+  },
+  {
+    "timestamp": "2024-10-28T18:33:24.722Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6884.34 MB",
+    "CoresMax": 8,
+    "Cores": "2.89%"
+  },
+  {
+    "timestamp": "2024-10-28T18:33:34.735Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6835.37 MB",
+    "CoresMax": 8,
+    "Cores": "1.72%"
+  },
+  {
+    "timestamp": "2024-10-28T18:33:44.741Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6876.09 MB",
+    "CoresMax": 8,
+    "Cores": "3.65%"
+  },
+  {
+    "timestamp": "2024-10-28T18:33:54.742Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6885.03 MB",
+    "CoresMax": 8,
+    "Cores": "2.70%"
+  },
+  {
+    "timestamp": "2024-10-28T18:34:04.754Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6877.64 MB",
+    "CoresMax": 8,
+    "Cores": "0.59%"
+  },
+  {
+    "timestamp": "2024-10-28T18:34:14.757Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6909.27 MB",
+    "CoresMax": 8,
+    "Cores": "0.58%"
+  },
+  {
+    "timestamp": "2024-10-28T18:34:24.772Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6882.35 MB",
+    "CoresMax": 8,
+    "Cores": "1.93%"
+  },
+  {
+    "timestamp": "2024-10-28T18:34:34.774Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6877.82 MB",
+    "CoresMax": 8,
+    "Cores": "1.36%"
+  },
+  {
+    "timestamp": "2024-10-28T18:34:44.786Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6891.18 MB",
+    "CoresMax": 8,
+    "Cores": "2.12%"
+  },
+  {
+    "timestamp": "2024-10-28T18:34:54.797Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6882.95 MB",
+    "CoresMax": 8,
+    "Cores": "2.12%"
+  },
+  {
+    "timestamp": "2024-10-28T18:35:04.810Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6874.52 MB",
+    "CoresMax": 8,
+    "Cores": "0.39%"
+  },
+  {
+    "timestamp": "2024-10-28T18:35:14.812Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6888.12 MB",
+    "CoresMax": 8,
+    "Cores": "0.75%"
+  },
+  {
+    "timestamp": "2024-10-28T18:35:24.819Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6886.14 MB",
+    "CoresMax": 8,
+    "Cores": "0.96%"
+  },
+  {
+    "timestamp": "2024-10-28T18:35:34.826Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6896.65 MB",
+    "CoresMax": 8,
+    "Cores": "1.55%"
+  },
+  {
+    "timestamp": "2024-10-28T18:35:44.837Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6859.87 MB",
+    "CoresMax": 8,
+    "Cores": "1.38%"
+  },
+  {
+    "timestamp": "2024-10-28T18:35:54.847Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6896.05 MB",
+    "CoresMax": 8,
+    "Cores": "2.13%"
+  },
+  {
+    "timestamp": "2024-10-28T18:36:04.854Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6857.52 MB",
+    "CoresMax": 8,
+    "Cores": "2.74%"
+  },
+  {
+    "timestamp": "2024-10-28T18:36:14.855Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6864.61 MB",
+    "CoresMax": 8,
+    "Cores": "0.37%"
+  },
+  {
+    "timestamp": "2024-10-28T18:36:24.856Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6844.56 MB",
+    "CoresMax": 8,
+    "Cores": "1.36%"
+  },
+  {
+    "timestamp": "2024-10-28T18:36:34.870Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6888.88 MB",
+    "CoresMax": 8,
+    "Cores": "1.36%"
+  },
+  {
+    "timestamp": "2024-10-28T18:36:44.877Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6890.13 MB",
+    "CoresMax": 8,
+    "Cores": "0.75%"
+  },
+  {
+    "timestamp": "2024-10-28T18:36:54.891Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6928.87 MB",
+    "CoresMax": 8,
+    "Cores": "3.07%"
+  },
+  {
+    "timestamp": "2024-10-28T18:37:04.903Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6888.34 MB",
+    "CoresMax": 8,
+    "Cores": "0.96%"
+  },
+  {
+    "timestamp": "2024-10-28T18:37:14.915Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6913.37 MB",
+    "CoresMax": 8,
+    "Cores": "2.54%"
+  },
+  {
+    "timestamp": "2024-10-28T18:37:24.924Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6897.59 MB",
+    "CoresMax": 8,
+    "Cores": "2.12%"
+  },
+  {
+    "timestamp": "2024-10-28T18:37:34.925Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "6932.69 MB",
+    "CoresMax": 8,
+    "Cores": "4.81%"
+  },
+  {
+    "timestamp": "2024-10-28T18:37:44.932Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7080.89 MB",
+    "CoresMax": 8,
+    "Cores": "1.92%"
+  },
+  {
+    "timestamp": "2024-10-28T18:37:54.936Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7081.10 MB",
+    "CoresMax": 8,
+    "Cores": "0.00%"
+  },
+  {
+    "timestamp": "2024-10-28T18:38:04.937Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7052.37 MB",
+    "CoresMax": 8,
+    "Cores": "0.57%"
+  },
+  {
+    "timestamp": "2024-10-28T18:38:14.937Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7210.51 MB",
+    "CoresMax": 8,
+    "Cores": "4.34%"
+  },
+  {
+    "timestamp": "2024-10-28T18:38:24.952Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7306.29 MB",
+    "CoresMax": 8,
+    "Cores": "3.66%"
+  },
+  {
+    "timestamp": "2024-10-28T18:38:34.966Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7400.96 MB",
+    "CoresMax": 8,
+    "Cores": "1.55%"
+  },
+  {
+    "timestamp": "2024-10-28T18:38:44.971Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7451.58 MB",
+    "CoresMax": 8,
+    "Cores": "2.86%"
+  },
+  {
+    "timestamp": "2024-10-28T18:38:54.976Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7475.09 MB",
+    "CoresMax": 8,
+    "Cores": "2.50%"
+  },
+  {
+    "timestamp": "2024-10-28T18:39:04.985Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7425.56 MB",
+    "CoresMax": 8,
+    "Cores": "0.39%"
+  },
+  {
+    "timestamp": "2024-10-28T18:39:14.995Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7444.79 MB",
+    "CoresMax": 8,
+    "Cores": "1.55%"
+  },
+  {
+    "timestamp": "2024-10-28T18:39:25.005Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7450.16 MB",
+    "CoresMax": 8,
+    "Cores": "0.00%"
+  },
+  {
+    "timestamp": "2024-10-28T18:39:35.018Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7415.13 MB",
+    "CoresMax": 8,
+    "Cores": "0.38%"
+  },
+  {
+    "timestamp": "2024-10-28T18:39:45.021Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7436.99 MB",
+    "CoresMax": 8,
+    "Cores": "1.33%"
+  },
+  {
+    "timestamp": "2024-10-28T18:39:55.027Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7354.91 MB",
+    "CoresMax": 8,
+    "Cores": "1.96%"
+  },
+  {
+    "timestamp": "2024-10-28T18:40:05.037Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7360.13 MB",
+    "CoresMax": 8,
+    "Cores": "1.14%"
+  },
+  {
+    "timestamp": "2024-10-28T18:40:15.051Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7356.48 MB",
+    "CoresMax": 8,
+    "Cores": "1.74%"
+  },
+  {
+    "timestamp": "2024-10-28T18:40:25.051Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7347.77 MB",
+    "CoresMax": 8,
+    "Cores": "1.15%"
+  },
+  {
+    "timestamp": "2024-10-28T18:40:35.063Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7404.55 MB",
+    "CoresMax": 8,
+    "Cores": "1.92%"
+  },
+  {
+    "timestamp": "2024-10-28T18:40:45.074Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7394.58 MB",
+    "CoresMax": 8,
+    "Cores": "1.76%"
+  },
+  {
+    "timestamp": "2024-10-28T18:40:55.080Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7330.56 MB",
+    "CoresMax": 8,
+    "Cores": "0.77%"
+  },
+  {
+    "timestamp": "2024-10-28T18:41:05.094Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7311.40 MB",
+    "CoresMax": 8,
+    "Cores": "0.20%"
+  },
+  {
+    "timestamp": "2024-10-28T18:41:15.103Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7313.24 MB",
+    "CoresMax": 8,
+    "Cores": "4.09%"
+  },
+  {
+    "timestamp": "2024-10-28T18:41:25.117Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7298.06 MB",
+    "CoresMax": 8,
+    "Cores": "4.58%"
+  },
+  {
+    "timestamp": "2024-10-28T18:41:35.121Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7305.37 MB",
+    "CoresMax": 8,
+    "Cores": "1.73%"
+  },
+  {
+    "timestamp": "2024-10-28T18:41:45.121Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7298.30 MB",
+    "CoresMax": 8,
+    "Cores": "1.17%"
+  },
+  {
+    "timestamp": "2024-10-28T18:41:55.136Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7343.29 MB",
+    "CoresMax": 8,
+    "Cores": "1.55%"
+  },
+  {
+    "timestamp": "2024-10-28T18:42:05.144Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7314.27 MB",
+    "CoresMax": 8,
+    "Cores": "1.73%"
+  },
+  {
+    "timestamp": "2024-10-28T18:42:15.149Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7340.47 MB",
+    "CoresMax": 8,
+    "Cores": "2.23%"
+  },
+  {
+    "timestamp": "2024-10-28T18:42:25.158Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7316.25 MB",
+    "CoresMax": 8,
+    "Cores": "2.11%"
+  },
+  {
+    "timestamp": "2024-10-28T18:42:35.172Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7326.57 MB",
+    "CoresMax": 8,
+    "Cores": "1.92%"
+  },
+  {
+    "timestamp": "2024-10-28T18:42:45.173Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7341.18 MB",
+    "CoresMax": 8,
+    "Cores": "1.16%"
+  },
+  {
+    "timestamp": "2024-10-28T18:42:55.174Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7293.83 MB",
+    "CoresMax": 8,
+    "Cores": "0.77%"
+  },
+  {
+    "timestamp": "2024-10-28T18:43:05.174Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7300.16 MB",
+    "CoresMax": 8,
+    "Cores": "0.38%"
+  },
+  {
+    "timestamp": "2024-10-28T18:43:15.178Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7323.30 MB",
+    "CoresMax": 8,
+    "Cores": "1.15%"
+  },
+  {
+    "timestamp": "2024-10-28T18:43:25.185Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7338.29 MB",
+    "CoresMax": 8,
+    "Cores": "0.96%"
+  },
+  {
+    "timestamp": "2024-10-28T18:43:35.187Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7287.91 MB",
+    "CoresMax": 8,
+    "Cores": "0.38%"
+  },
+  {
+    "timestamp": "2024-10-28T18:43:45.188Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7351.32 MB",
+    "CoresMax": 8,
+    "Cores": "0.38%"
+  },
+  {
+    "timestamp": "2024-10-28T18:43:55.200Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7311.80 MB",
+    "CoresMax": 8,
+    "Cores": "0.20%"
+  },
+  {
+    "timestamp": "2024-10-28T18:44:05.204Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7291.75 MB",
+    "CoresMax": 8,
+    "Cores": "0.37%"
+  },
+  {
+    "timestamp": "2024-10-28T18:44:15.210Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7308.17 MB",
+    "CoresMax": 8,
+    "Cores": "0.76%"
+  },
+  {
+    "timestamp": "2024-10-28T18:44:25.222Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7281.54 MB",
+    "CoresMax": 8,
+    "Cores": "2.35%"
+  },
+  {
+    "timestamp": "2024-10-28T18:44:35.233Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7276.48 MB",
+    "CoresMax": 8,
+    "Cores": "1.15%"
+  },
+  {
+    "timestamp": "2024-10-28T18:44:45.245Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7304.64 MB",
+    "CoresMax": 8,
+    "Cores": "2.51%"
+  },
+  {
+    "timestamp": "2024-10-28T18:44:55.248Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7707.70 MB",
+    "CoresMax": 8,
+    "Cores": "8.08%"
+  },
+  {
+    "timestamp": "2024-10-28T18:45:05.252Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7613.29 MB",
+    "CoresMax": 8,
+    "Cores": "0.97%"
+  },
+  {
+    "timestamp": "2024-10-28T18:45:15.260Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7511.01 MB",
+    "CoresMax": 8,
+    "Cores": "1.95%"
+  },
+  {
+    "timestamp": "2024-10-28T18:45:25.269Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7508.31 MB",
+    "CoresMax": 8,
+    "Cores": "1.14%"
+  },
+  {
+    "timestamp": "2024-10-28T18:45:35.272Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7475.70 MB",
+    "CoresMax": 8,
+    "Cores": "8.04%"
+  },
+  {
+    "timestamp": "2024-10-28T18:45:45.278Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7484.98 MB",
+    "CoresMax": 8,
+    "Cores": "2.31%"
+  },
+  {
+    "timestamp": "2024-10-28T18:45:55.289Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7489.72 MB",
+    "CoresMax": 8,
+    "Cores": "3.10%"
+  },
+  {
+    "timestamp": "2024-10-28T18:46:05.300Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7504.73 MB",
+    "CoresMax": 8,
+    "Cores": "10.57%"
+  },
+  {
+    "timestamp": "2024-10-28T18:46:15.303Z",
+    "RamMax": "7937.99 MB",
+    "Ram": "7711.95 MB",
+    "CoresMax": 8,
+    "Cores": "2.49%"
+  }
+]

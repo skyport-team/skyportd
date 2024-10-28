@@ -67,7 +67,7 @@ async function init() {
             }
         })
 
-        const volumesPath = path.join(__dirname, '../volumes');
+        const volumesPath = path.join(__dirname, './volumes');
         await fs2.mkdir(volumesPath, { recursive: true });
 
         log.info('volumes folder created successfully');
