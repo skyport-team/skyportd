@@ -75,6 +75,26 @@ async function init() {
 
         // Node Stats
         statsLogger.initLogger();
+
+        // Dockerode Fix for Windows
+        if (process.platform === 'win32') {
+            const lockFilePath = path.join(__dirname, 'node_modules', 'docker-modem', 'lib', 'docker_modem_fix.lock');
+            const modemPath = path.join(__dirname, 'node_modules', 'docker-modem', 'lib', 'modem.js');
+            const modemUrl = 'https://raw.githubusercontent.com/achul123/docker-modem/refs/heads/master/lib/modem.js';
+        
+            if (!fs.existsSync(lockFilePath)) {
+                log.info('Fixing docker-modem for windows...');
+                // download the file and save in /node_modules/docker-modem/lib/modem.js
+                const response = await fetch(modemUrl);
+                const data = await response.text();
+                await fs2.writeFile(modemPath, data);
+            
+                // Create the lock file to prevent future executions
+                await fs2.writeFile(lockFilePath, 'Docker-modem fix applied');
+                log.info('Docker-modem fix applied');
+            }
+        }
+
     } catch (error) {
         log.error('failed to retrieve image list from remote! the panel might be down. error:', error.message);
         process.exit();
