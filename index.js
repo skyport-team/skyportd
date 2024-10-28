@@ -32,6 +32,7 @@ const fs = require('node:fs');
 const path = require('path');
 const chalk = require('chalk')
 const fs2 = require('fs').promises;
+const ascii = fs.readFileSync('./handlers/ascii.txt', 'utf8');
 const { exec } = require('child_process');
 const { start, createNewVolume } = require('./routes/FTP.js')
 const { createDatabaseAndUser } = require('./routes/Database.js');
@@ -56,11 +57,10 @@ const log = new CatLoggr();
  * user keys from the configuration. Initializes routes for managing Docker instances, deployments, and
  * power controls. These routes are grouped under the '/instances' path.
  */
+console.log(chalk.gray(ascii) + chalk.white(`version v${config.version}\n`));
 async function init() {
     try {
-        const ascii = fs.readFileSync('./handlers/ascii.txt', 'utf8');
-        console.log(chalk.gray(ascii) + chalk.white(`version v${config.version}\n`));
-        await docker.ping((err) => {
+        docker.ping((err) => {
             if (err) {
                 log.error(chalk.red('Docker is not running or not installed. Please install Docker and try again.'))
                 process.exit()
@@ -138,15 +138,16 @@ app.get('/stats', async (req, res) => {
 // FTP
 start();
 // FTP Route
-app.get('/ftp/info/:id', async (req, res) => {
+app.get('/ftp/info/:id', (req, res) => {
     const filePath = './ftp/user-' + req.params.id + '.json';
-    try {
-        const data = await fs2.readFile(filePath, 'utf8');
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            log.error('Error reading file:', err);
+            res.status(500).json({ error: 'Error reading file' });
+            return;
+        }
         res.json(JSON.parse(data));
-    } catch (err) {
-        console.error(`Error reading file for user ${req.params.id}:`, err);
-        res.status(500).json({ error: 'Error reading FTP information' });
-    }
+    });
 });
 
 // Database Route
@@ -206,6 +207,7 @@ loadRouters();
  */
 function initializeWebSocketServer(server) {
     const wss = new WebSocket.Server({ server }); // use express-ws so you can have multiple ws's, api routes & that on 1 server.
+    const containerLogs = {}; // Store logs for each container in memory
 
     wss.on('connection', (ws, req) => {
         let isAuthenticated = false;
@@ -243,7 +245,7 @@ function initializeWebSocketServer(server) {
 
                 switch (msg.event) {
                     case 'cmd':
-                        // Do absolutely fucking nothing. Not handling it here.
+                        executeCommand(ws, container, msg.command);
                         break;
                     case 'power:start':
                         performPowerAction(ws, container, 'start');
@@ -285,6 +287,15 @@ function initializeWebSocketServer(server) {
             }
         }
 
+
+        /**
+         * Handles an incoming WebSocket connection.
+         *
+         * @param {WebSocket} ws - The incoming WebSocket object
+         * @param {Request} req - The request that triggered the WebSocket connection
+         * @param {string} containerId - The ID of the container to connect to
+         * @param {number} volumeId - The volume ID to connect to (or 0 for the default volume)
+         */
         function handleWebSocketConnection(ws, req, containerId, volumeId) {
             const container = docker.getContainer(containerId);
             const volume = volumeId || 0;
@@ -294,7 +305,7 @@ function initializeWebSocketServer(server) {
                     ws.send('Container not found');
                     return;
                 }
-
+        
                 if (req.url.startsWith('/exec/')) {
                     setupExecSession(ws, container);
                 } else if (req.url.startsWith('/stats/')) {
@@ -305,33 +316,54 @@ function initializeWebSocketServer(server) {
             });
         }
 
-        async function setupExecSession(ws, container) {
+        function initializeContainerLogs(containerId) {
+            containerLogs[containerId] = [];
+        }
+        
+        async function streamDockerLogs(ws, container) {
+            const containerId = container.id;
+
+            if (!containerLogs[containerId]) {
+                initializeContainerLogs(containerId);
+            }
+
+            if (containerLogs[containerId].length > 0) {
+                containerLogs[containerId].forEach(logMessage => {
+                    ws.send(formatLogMessage(logMessage));
+                });
+            }
+
             const logStream = await container.logs({
                 follow: true,
                 stdout: true,
                 stderr: true,
-                tail: 25
+                tail: 0 // Start streaming logs immediately 
             });
-
+        
             logStream.on('data', chunk => {
-                ws.send(chunk.toString());
-                // Display log container
-                // console.log(chunk.toString());
-            });
+                const logMessage = {
+                    timestamp: new Date().toISOString(),
+                    content: chunk.toString(),
+                };
 
-            ws.on('message', (msg) => {
-                if (isAuthenticated) {
-                    const command = JSON.parse(msg).command;
-                    if (command) {
-                        executeCommand(ws, container, command);
-                    }
-                }
-            });
+                containerLogs[containerId].push(logMessage);
 
+                ws.send(formatLogMessage(logMessage));
+            });
+        
             ws.on('close', () => {
                 logStream.destroy();
                 log.info('WebSocket client disconnected');
             });
+        }
+        
+        // Helper function to format log messages
+        function formatLogMessage(logMessage) {
+            return `\r\n\u001b[34m[docker] \x1b[0m${logMessage.content}\r\n`;
+        }
+
+        async function setupExecSession(ws, container) {
+            streamDockerLogs(ws, container);
         }
 
         async function setupStatsStreaming(ws, container, volumeId) {
@@ -374,34 +406,38 @@ function initializeWebSocketServer(server) {
                 const stream = await container.attach({
                     stream: true,
                     stdin: true,
-                    stdout: false, // doesn't use stdout
-                    stderr: false,  // doesn't use stderr
+                    stdout: true,
+                    stderr: false, // doesn't use stderr
                     hijack: true
                 });
         
+                // Collect output and send it back via WebSocket
                 stream.on('data', (chunk) => {
                     //ws.send(chunk.toString('utf8'));
                 });
         
                 stream.on('end', () => {
                     log.info('Attach stream ended');
-                    ws.send('\nCommand execution completed');
+                    //ws.send('\nCommand execution completed');
                 });
         
                 stream.on('error', (err) => {
                     log.error('Attach stream error:', err);
                     ws.send(`Error in attach stream: ${err.message}`);
                 });
-                
-                // Write the command to the stream
-                stream.write(command + '\n'); // your not disattaching.
+        
+                //log.info('Executing command:', command);
+                stream.write(command + '\n');
+        
+                // Detach after sending the command to ensure proper execution
+                stream.end();
         
             } catch (err) {
                 log.error('Failed to attach to container:', err);
                 ws.send(`Failed to attach to container: ${err.message}`);
             }
         }
-        
+
         async function performPowerAction(ws, container, action) {
             const actionMap = {
                 'start': container.start.bind(container),
@@ -410,17 +446,42 @@ function initializeWebSocketServer(server) {
             };
         
             if (!actionMap[action]) {
-                ws.send(`\r\n\u001b[33m[skyportd] \x1b[0Invalid action: ${action}\r\n`);
+                ws.send(`\r\n\u001b[33m[skyportd] \x1b[0mInvalid action: ${action}\r\n`);
                 return;
             }
         
-            ws.send(`\r\n\u001b[33m[skyportd] \x1b[0mWorking on ${action}...\r\n`);
+            const containerId = container.id;
+            const timestamp = new Date().toISOString();
+            const message = {
+                timestamp: timestamp,
+                content: `\r\n\u001b[33m[skyportd] \x1b[0mWorking on ${action}...\r\n`,
+            };
+        
+            ws.send(message.content); // Send the initial working message
         
             try {
-                await actionMap[action]();
+                if (action === 'restart' || action === 'stop') {
+                    containerLogs[containerId] = [];
+                }
+
+                // Start logging the container's logs
+                streamDockerLogs(ws, container); // Start log streaming before the action
+                
+                await actionMap[action](); // Perform the requested action
+        
+                const successMessage = {
+                    timestamp: new Date().toISOString(),
+                    content: `\r\n\u001b[32m[skyportd] \x1b[0m${action.charAt(0).toUpperCase() + action.slice(1)} action completed.\r\n`,
+                };
+                ws.send(successMessage.content);
+        
             } catch (err) {
                 log.error(`Error performing ${action} action:`, err.message);
-                ws.send(`\r\n\u001b[33m[skyportd] \x1b[0mAction failed: ${err.message}\r\n`);
+                const errorMessage = {
+                    timestamp: new Date().toISOString(),
+                    content: `\r\n\u001b[31m[skyportd] \x1b[0mAction failed: ${err.message}\r\n`,
+                };
+                ws.send(errorMessage.content);
             }
         }
 
@@ -512,8 +573,6 @@ app.use((err, req, res, next) => {
  * Logs a startup message indicating successful listening. This delayed start allows for any necessary
  * initializations to complete before accepting incoming connections.
  */
-async function startServer() {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    server.listen(config.port, () => log.info(`Skyport Daemon is listening on port ${config.port}`));
-}
-startServer();
+setTimeout(function (){
+  server.listen(config.port, () => log.info(`skyportd is listening on port ${config.port}`));
+}, 2000);
