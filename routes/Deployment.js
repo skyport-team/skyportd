@@ -253,6 +253,7 @@ const redeployContainer = async (req, res) => {
 
         const { Image, Id, Ports, Memory, Cpu, PortBindings, Env } = req.body;
         const volumePath = path.join(__dirname, '../volumes', Id);
+        log.info(`Pulling image: ${Image}`);
         try {
             const stream = await docker.pull(Image);
             await new Promise((resolve, reject) => {
@@ -306,6 +307,7 @@ const reinstallContainer = async (req, res) => {
         const { Image, Id, Ports, Memory, Cpu, PortBindings, Env, imageData } = req.body;
         const volumePath = path.join(__dirname, '../volumes', Id);
 
+        log.info(`Pulling image: ${Image}`);
         try {
             const stream = await docker.pull(Image);
             await new Promise((resolve, reject) => {
