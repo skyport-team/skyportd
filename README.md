@@ -5,7 +5,7 @@ Skyport Daemon is the daemon for the Skyport Panel.
 
 ## Installation
 1. Clone the repository:
-`git clone https://github.com/skyportlabs/skyportd`
+`git clone https://github.com/skyport-team/skyportd`
 
 2. Install dependencies:
 `npm install`
