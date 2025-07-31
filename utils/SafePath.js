@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 
 /**
  * Ensures the target path is within the specified base directory, preventing directory traversal attacks.
@@ -8,11 +8,11 @@ const path = require('path');
  * @throws {Error} If the resolved path attempts to escape the base directory.
  */
 function safePath(base, target) {
-    const fullPath = path.resolve(base, target);
-    if (!fullPath.startsWith(base)) {
-        throw new Error('Attempting to access outside of the volume');
-    }
-    return fullPath;
+  const fullPath = path.resolve(base, target);
+  if (!fullPath.startsWith(base)) {
+    throw new Error("Attempting to access outside of the volume");
+  }
+  return fullPath;
 }
 
 module.exports = { safePath };

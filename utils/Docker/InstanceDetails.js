@@ -1,4 +1,4 @@
-const Docker = require('dockerode');
+const Docker = require("dockerode");
 const docker = new Docker({ socketPath: process.env.dockerSocket });
 
 /**
@@ -13,11 +13,12 @@ const docker = new Docker({ socketPath: process.env.dockerSocket });
  * @returns {Response} JSON response with detailed container information or an error message indicating the container was not found.
  */
 const getInstanceDetails = (req, res) => {
-  if (!req.params.id) return res.status(400).json({ message: 'Container ID is required' });
+  if (!req.params.id)
+    return res.status(400).json({ message: "Container ID is required" });
   const container = docker.getContainer(req.params.id);
   container.inspect((err, data) => {
     if (err) {
-      return res.status(404).json({ message: 'Container not found' });
+      return res.status(404).json({ message: "Container not found" });
     }
     res.json(data);
   });

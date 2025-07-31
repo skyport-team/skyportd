@@ -1,6 +1,6 @@
-const Docker = require('dockerode');
-const fs = require('fs');
-const path = require('path');
+const Docker = require("dockerode");
+const fs = require("fs");
+const path = require("path");
 const docker = new Docker({ socketPath: process.env.dockerSocket });
 
 /**
@@ -20,21 +20,26 @@ const purgeAllInstances = async (req, res) => {
 
       try {
         const { Name } = await container.inspect();
-        const nameWithoutSlash = Name.startsWith('/') ? Name.slice(1) : Name;
-        const volumeDir = path.join(__dirname, '../volumes', nameWithoutSlash);
+        const nameWithoutSlash = Name.startsWith("/") ? Name.slice(1) : Name;
+        const volumeDir = path.join(__dirname, "../volumes", nameWithoutSlash);
         await container.remove({ force: true });
         if (fs.existsSync(volumeDir)) {
           fs.rmSync(volumeDir, { recursive: true, force: true });
           console.log(`Deleted volume directory: ${volumeDir}`);
         }
       } catch (err) {
-        console.error(`Error deleting container or volume for ${containerInfo.Id}:`, err.message);
+        console.error(
+          `Error deleting container or volume for ${containerInfo.Id}:`,
+          err.message
+        );
       }
     }
 
-    const volumesBaseDir = path.join(__dirname, '../volumes');
+    const volumesBaseDir = path.join(__dirname, "../volumes");
     if (fs.existsSync(volumesBaseDir)) {
-      const volumeFolders = fs.readdirSync(volumesBaseDir, { withFileTypes: true });
+      const volumeFolders = fs.readdirSync(volumesBaseDir, {
+        withFileTypes: true,
+      });
       for (const dirent of volumeFolders) {
         const dirPath = path.join(volumesBaseDir, dirent.name);
         if (dirent.isDirectory()) {
@@ -44,9 +49,9 @@ const purgeAllInstances = async (req, res) => {
       }
     }
 
-    res.json({ message: 'All containers and volume directories deleted' });
+    res.json({ message: "All containers and volume directories deleted" });
   } catch (err) {
-    console.error('Error during purge:', err.message);
+    console.error("Error during purge:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
