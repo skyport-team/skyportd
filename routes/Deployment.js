@@ -17,6 +17,9 @@ const statesFilePath = path.join(__dirname, "../storage/states.json");
 // Utility function to read states
 const readStates = async () => {
   try {
+    if (!fsSync.existsSync(statesFilePath)) {
+      await fs.writeFile(statesFilePath, JSON.stringify({}, null, 2));
+    }
     const data = await fs.readFile(statesFilePath, "utf8");
     return JSON.parse(data);
   } catch (error) {
@@ -29,6 +32,9 @@ const readStates = async () => {
 
 // Utility function to write states
 const writeStates = async (states) => {
+  if (!fsSync.existsSync(statesFilePath)) {
+    await fs.writeFile(statesFilePath, JSON.stringify({}, null, 2));
+  }
   await fs.writeFile(statesFilePath, JSON.stringify(states, null, 2));
 };
 
@@ -306,12 +312,10 @@ const redeployContainer = async (req, res) => {
 
     const newContainer = await docker.createContainer(containerOptions);
     await newContainer.start();
-    res
-      .status(200)
-      .json({
-        message: "Container redeployed successfully",
-        containerId: newContainer.id,
-      });
+    res.status(200).json({
+      message: "Container redeployed successfully",
+      containerId: newContainer.id,
+    });
     await updateState(Idd, "READY", newContainer.id);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -399,12 +403,10 @@ const reinstallContainer = async (req, res) => {
     }
 
     await newContainer.start();
-    res
-      .status(200)
-      .json({
-        message: "Container reinstalled successfully",
-        containerId: newContainer.id,
-      });
+    res.status(200).json({
+      message: "Container reinstalled successfully",
+      containerId: newContainer.id,
+    });
     await updateState(Idd, "READY", newContainer.id);
   } catch (err) {
     log.error("Error reinstalling instance:", err);

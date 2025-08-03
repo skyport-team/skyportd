@@ -26,13 +26,13 @@ router.get("/fs/:id/files", async (req, res) => {
   if (!volumeId) return res.status(400).json({ message: "No volume ID" });
 
   try {
-    const fullPath = safePath(volumePath, subPath);
-    const files = await fs.readdir(fullPath, { withFileTypes: true });
+    const filePath = safePath(volumePath, subPath);
+    const files = await fs.readdir(filePath, { withFileTypes: true });
 
     const detailedFiles = await Promise.all(
       files.map(async (file) => {
-        const filePath = path.join(fullPath, file.name);
-        const stats = await fs.stat(filePath);
+        const fileFullPath = path.join(filePath, file.name);
+        const stats = await fs.stat(fileFullPath);
 
         return {
           name: file.name,

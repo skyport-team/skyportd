@@ -1,6 +1,9 @@
 node_modules/
 volumes/
 tmp/
+storage/
 ftp/
 archives/
 package-lock.json
+config.json
+pnpm-lock.yaml

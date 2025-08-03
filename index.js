@@ -25,7 +25,7 @@ process.env.dockerSocket =
     ? "//./pipe/docker_engine"
     : "/var/run/docker.sock";
 const express = require("express");
-const Docker = require("dockerode");
+
 const basicAuth = require("express-basic-auth");
 const bodyParser = require("body-parser");
 const CatLoggr = require("cat-loggr");
@@ -42,6 +42,10 @@ const { createDatabaseAndUser } = require("./handlers/database.js");
 const config = require("./config.json");
 const statsLogger = require("./handlers/stats.js");
 
+const Docker2 = require("./utils/Docker");
+const Docker = require("dockerode");
+
+const docker2 = new Docker2({ socketPath: process.env.dockerSocket });
 const docker = new Docker({ socketPath: process.env.dockerSocket });
 
 /**
@@ -63,55 +67,92 @@ const log = new CatLoggr();
 console.log(chalk.gray(ascii) + chalk.white(`version v${config.version}\n`));
 async function init() {
   try {
-    docker.ping((err) => {
-      if (err) {
-        log.error(
-          chalk.red(
-            "Docker is not running or not installed. Please install Docker and try again."
-          )
-        );
-        process.exit();
-      }
-    });
+    const ping = await docker2.ping();
+    // not the best way to check if docker is running, but it works
+    if (ping.includes("error: connect ENOENT")) {
+      log.error("Docker is not running - skyportd will not function properly.");
+      log.error("Please check if Docker is running and try again.");
+      process.exit();
+    }
 
     const volumesPath = path.join(__dirname, "./volumes");
     await fs2.mkdir(volumesPath, { recursive: true });
 
     log.info("volumes folder created successfully");
 
+    const storagePath = path.join(__dirname, "./storage");
+    await fs2.mkdir(storagePath, { recursive: true });
+
+    log.info("storage folder created successfully");
+
     // Node Stats
     statsLogger.initLogger();
 
     // Dockerode Fix for Windows
     if (process.platform === "win32") {
-      const lockFilePath = path.join(
+      const pnpmModemDir = path.join(
+        __dirname,
+        "node_modules",
+        ".pnpm",
+        "docker-modem@5.0.6",
+        "node_modules",
+        "docker-modem",
+        "lib"
+      );
+      const npmModemDir = path.join(
         __dirname,
         "node_modules",
         "docker-modem",
-        "lib",
-        "docker_modem_fix.lock"
+        "lib"
       );
-      const modemPath = path.join(
-        __dirname,
-        "node_modules",
-        "docker-modem",
-        "lib",
-        "modem.js"
-      );
+
+      const modemDir = fs.existsSync(pnpmModemDir)
+        ? pnpmModemDir
+        : fs.existsSync(npmModemDir)
+        ? npmModemDir
+        : null;
+
+      if (!modemDir) {
+        log.error("Docker-modem directory not found. Cannot apply fix.");
+        return;
+      }
+
+      const modemPath = path.join(modemDir, "modem.js");
+      const lockFilePath = path.join(modemDir, "docker_modem_fix.lock");
       const modemUrl =
         "https://raw.githubusercontent.com/achul123/docker-modem/refs/heads/master/lib/modem.js";
 
-      if (!fs.existsSync(lockFilePath)) {
-        log.info("Fixing docker-modem for windows...");
-        // download the file and save in /node_modules/docker-modem/lib/modem.js
-        const response = await fetch(modemUrl);
-        const data = await response.text();
-        await fs2.writeFile(modemPath, data);
+      try {
+        await fs2.mkdir(modemDir, { recursive: true });
 
-        // Create the lock file to prevent future executions
-        await fs2.writeFile(lockFilePath, "Docker-modem fix applied");
-        log.info("Docker-modem fix applied");
+        if (!fs.existsSync(lockFilePath)) {
+          log.info("Fixing docker-modem for windows...");
+
+          const response = await fetch(modemUrl);
+          const data = await response.text();
+
+          await fs2.writeFile(modemPath, data);
+
+          // Create the lock file to prevent future executions
+          await fs2.writeFile(lockFilePath, "Docker-modem fix applied");
+          log.info("Docker-modem fix applied successfully");
+        }
+      } catch (error) {
+        log.error("Failed to apply docker-modem fix:", error.message);
+
+        if (error.code === "ENOENT") {
+          log.error("Detailed directory info:", {
+            pnpmModemDir,
+            npmModemDir,
+            modemDir,
+            modemPath,
+            lockFilePath,
+          });
+        }
       }
+
+      // moved here for be sure folder is created before loading routers
+      loadRouters();
     }
   } catch (error) {
     log.error(
@@ -147,7 +188,8 @@ startLoggingStats();
 app.get("/stats", async (req, res) => {
   try {
     const totalStats = statsLogger.getSystemStats.total();
-    const containers = await docker.listContainers({ all: true });
+    const containers = await docker2.listContainers({ all: true });
+    //console.log("test ", containers);
     const onlineContainersCount = containers.filter(
       (container) => container.State === "running"
     ).length;
@@ -238,9 +280,6 @@ function loadRouters() {
     });
   });
 }
-
-// Call the function to load routers
-loadRouters();
 
 /**
  * Initializes a WebSocket server tied to the HTTP server. This WebSocket server handles real-time
@@ -610,11 +649,9 @@ app.get("/", async (req, res) => {
     res.json(response); // the point of this? just use the ws - yeah conn to the ws on nodes page and send that json over ws
   } catch (error) {
     log.error("Error fetching Docker status:", error);
-    res
-      .status(500)
-      .json({
-        error: "Docker is not running - skyportd will not function properly.",
-      });
+    res.status(500).json({
+      error: "Docker is not running - skyportd will not function properly.",
+    });
   }
 });
 

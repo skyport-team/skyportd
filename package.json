@@ -1,13 +1,15 @@
 {
   "name": "skyportd",
   "version": "0.3.0",
-  "description": "",
+  "description": "Skyport Daemon",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "configure": "node handlers/configure.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Skyport Team",
+  "license": "MIT",
   "dependencies": {
     "@keyv/sqlite": "^3.6.7",
     "archiver": "^7.0.1",
@@ -33,5 +35,8 @@
     "path": "^0.12.7",
     "unzipper": "^0.12.3",
     "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }

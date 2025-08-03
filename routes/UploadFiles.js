@@ -19,11 +19,11 @@ router.post("/fs/:id/files/upload", upload.array("files"), async (req, res) => {
   const subPath = req.query.path || "";
 
   try {
-    const fullPath = safePath(volumePath, subPath);
+    const filePath = safePath(volumePath, subPath);
 
     await Promise.all(
       req.files.map((file) => {
-        const destPath = path.join(fullPath, file.originalname);
+        const destPath = path.join(filePath, file.originalname);
         return fs.rename(file.path, destPath);
       })
     );

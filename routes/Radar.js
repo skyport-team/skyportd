@@ -11,16 +11,18 @@ const docker = new Docker();
 let flaggedContainers = {};
 
 (async () => {
-  if (await fs.pathExists(FLAGGED_CONTAINERS_FILE)) {
-    try {
-      flaggedContainers = await fs.readJson(FLAGGED_CONTAINERS_FILE);
-    } catch (error) {
-      console.error(`Error reading flagged containers file:`, error);
-      flaggedContainers = {};
-    }
+  if (!fs.existsSync(FLAGGED_CONTAINERS_FILE)) {
+    await fs.writeFile(FLAGGED_CONTAINERS_FILE, JSON.stringify({}, null, 2));
+  }
+  try {
+    flaggedContainers = await fs.readJson(FLAGGED_CONTAINERS_FILE);
+  } catch (error) {
+    console.error(`Error reading flagged containers file:`, error);
+    flaggedContainers = {};
   }
 })();
 
+// we should add an on off system, if it's on, download it on the github .radar
 async function loadStrategies() {
   try {
     const files = await fs.readdir(STRATEGIES_DIR);
