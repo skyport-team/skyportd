@@ -255,12 +255,56 @@ const createContainer = async (req, res) => {
 };
 
 const deleteContainer = async (req, res) => {
-  const container = docker.getContainer(req.params.id);
+  const containerId = req.params.id;
+  const container = docker.getContainer(containerId);
   try {
+    const containerInfo = await container.inspect();
+    if (!containerInfo.Name) {
+      return res.status(400).json({
+        message: "Container does not have the required names",
+        containerId: containerId,
+      });
+    }
+
+    const volumeId = containerInfo.Name.replace(/^\//, "");
+    if (!volumeId) {
+      return res.status(400).json({
+        message: "No volumeId found in container",
+        containerId: containerId,
+      });
+    }
+    const volumePath = path.join(__dirname, "../volumes", volumeId);
+
+    const volumeExists = await fs
+      .access(volumePath)
+      .then(() => true)
+      .catch(() => false);
+
+    if (containerInfo.State.Running) {
+      log.info(`Stopping container ${containerInfo.Id.substring(0, 12)}`);
+      await container.stop({ t: 10 });
+    }
+
     await container.remove();
-    res.status(200).json({ message: "Container removed successfully" });
+
+    if (volumeExists) {
+      await fs.rm(volumePath, { recursive: true, force: true });
+    }
+
+    const states = await readStates();
+    delete states[volumeId];
+    await writeStates(states);
+
+    res.status(200).json({
+      message: "Container and volume removed successfully",
+      containerId: containerId,
+      volumeId: volumeId,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Delete container error:", err);
+    res.status(500).json({
+      message: err.message,
+    });
   }
 };
 
