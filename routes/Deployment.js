@@ -158,6 +158,20 @@ const createContainer = async (req, res) => {
     req.body;
   let variables = req.body.variables || {};
 
+  if (PortBindings) {
+    for (const [containerPort, hostBindings] of Object.entries(PortBindings)) {
+      for (const binding of hostBindings) {
+        const port = parseInt(binding.HostPort, 10);
+        if (isNaN(port) || port < 1 || port > 65535) {
+          log.error(`Invalid port specification: ${binding.HostPort}`);
+          return res.status(400).json({
+            message: `Invalid port specification: ${binding.HostPort}. Port must be between 1 and 65535.`,
+          });
+        }
+      }
+    }
+  }
+
   if (typeof variables !== "string") {
     variables = JSON.stringify(variables);
   } else {
