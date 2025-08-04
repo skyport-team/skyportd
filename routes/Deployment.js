@@ -158,6 +158,7 @@ const createContainer = async (req, res) => {
     req.body;
   let variables = req.body.variables || {};
 
+  // Early port validation to reject invalid specs and avoid stuck "INSTALLING" state i think
   if (PortBindings) {
     for (const [containerPort, hostBindings] of Object.entries(PortBindings)) {
       for (const binding of hostBindings) {

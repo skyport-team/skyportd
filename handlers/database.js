@@ -24,11 +24,16 @@ async function createDatabaseAndUser(dbName) {
   const password = generatePassword();
   const credentials = { dbName, userName, password, host: config.mysql.host };
 
+  if (!config.mysql || !config.mysql.host || !config.mysql.user) {
+    log.error("Invalid MySQL configuration:", config.mysql);
+    throw new Error("MySQL configuration is incomplete");
+  }
+
   try {
     connection = await mysql.createConnection({
       host: config.mysql.host,
       user: config.mysql.user,
-      password: config.mysql.password,
+      password: config.mysql.password || "",
     });
 
     log.info("Connected to the MySQL server.");
@@ -50,8 +55,17 @@ async function createDatabaseAndUser(dbName) {
 
     return credentials;
   } catch (err) {
-    log.error("Error:", err);
-    log.info("Credentials attempted:", credentials);
+    if (err.code === "ECONNREFUSED") {
+      log.error(
+        `MySQL Connection Failed: Can't reach MySQL server at ${config.mysql.host}`
+      );
+      throw new Error("MySQL server is not running or unreachable");
+    }
+
+    log.error("MySQL Connection Error:", {
+      message: err.message,
+      code: err.code,
+    });
     throw err;
   } finally {
     if (connection) {

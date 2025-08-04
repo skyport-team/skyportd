@@ -36,9 +36,7 @@ const path = require("path");
 const chalk = require("chalk");
 const fs2 = require("fs").promises;
 const ascii = fs.readFileSync("./handlers/ascii.txt", "utf8");
-const { exec } = require("child_process");
-const { start, createNewVolume } = require("./handlers/ftp.js");
-const { createDatabaseAndUser } = require("./handlers/database.js");
+const { start } = require("./handlers/ftp.js");
 const config = require("./config.json");
 const statsLogger = require("./handlers/stats.js");
 
@@ -224,33 +222,6 @@ app.get("/stats", async (req, res) => {
 
 // FTP
 start();
-// FTP Route
-app.get("/ftp/info/:id", (req, res) => {
-  const filePath = "./ftp/user-" + req.params.id + ".json";
-  fs.readFile(filePath, "utf8", (err, data) => {
-    if (err) {
-      log.error("Error reading file:", err);
-      res.status(500).json({ error: "Error reading file" });
-      return;
-    }
-    res.json(JSON.parse(data));
-  });
-});
-
-// Database Route
-app.post("/database/create/:name", async (req, res) => {
-  try {
-    const dbName = req.params.name;
-    const credentials = await createDatabaseAndUser(dbName);
-    res.status(200).json({
-      message: `Database ${dbName} created successfully`,
-      credentials,
-    });
-  } catch (error) {
-    console.error("Error creating database:", error);
-    res.status(500).json({ error: "Failed to create database" });
-  }
-});
 
 // Function to dynamically load routers
 function loadRouters() {
@@ -641,7 +612,7 @@ app.get("/", async (req, res) => {
         password: config.mysql.password,
       },
       docker: {
-        status: isDockerRunning ? "running" : "not running",
+        status: isDockerRunning ? "running" : "not running", // uhm, should keep it or not idk
         systemInfo: dockerInfo,
       },
     };
