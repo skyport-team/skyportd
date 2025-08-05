@@ -16,11 +16,10 @@ const { safePath } = require("../utils/SafePath");
 router.post("/fs/:id/folders/create/:foldername", async (req, res) => {
   const { id, foldername } = req.params;
   const volumePath = path.join(__dirname, "../volumes", id);
-  const subPath = req.query.path || "";
+  const subPath = (req.query.path || "").replace(/^\/+/, '').replace(/\\/g, '/');
 
   try {
-    const fullPath = safePath(volumePath, subPath);
-    const targetFolderPath = path.join(fullPath, foldername);
+    const targetFolderPath = safePath(volumePath, path.join(subPath, foldername));
 
     await fs.mkdir(targetFolderPath, { recursive: true });
     res.json({ message: "Folder created successfully" });
