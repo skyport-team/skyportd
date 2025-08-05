@@ -7,6 +7,7 @@ const {
   getFilePurpose,
   isEditable,
   formatFileSize,
+  calculateDirectorySize,
 } = require("../utils/FileType");
 
 /**
@@ -21,7 +22,8 @@ const {
 router.get("/fs/:id/files", async (req, res) => {
   const volumeId = req.params.id;
   const subPath = req.query.path || "";
-  const volumePath = path.join(__dirname, "../volumes", volumeId);
+  const volumesPath = path.join(__dirname, "../volumes");
+  const volumePath = path.join(volumesPath, volumeId);
 
   if (!volumeId) return res.status(400).json({ message: "No volume ID" });
 
@@ -33,12 +35,20 @@ router.get("/fs/:id/files", async (req, res) => {
       files.map(async (file) => {
         const fileFullPath = path.join(filePath, file.name);
         const stats = await fs.stat(fileFullPath);
+        let size;
+
+        if (file.isDirectory()) {
+          const dirSize = await calculateDirectorySize(fileFullPath);
+          size = formatFileSize(dirSize);
+        } else {
+          size = formatFileSize(stats.size);
+        }
 
         return {
           name: file.name,
           isDirectory: file.isDirectory(),
           isEditable: isEditable(file.name),
-          size: formatFileSize(stats.size),
+          size: size,
           lastUpdated: stats.mtime.toISOString(),
           purpose: file.isDirectory() ? "folder" : getFilePurpose(file.name),
           extension: path.extname(file.name).toLowerCase(),
@@ -51,6 +61,8 @@ router.get("/fs/:id/files", async (req, res) => {
   } catch (err) {
     if (err.message.includes("Attempting to access outside of the volume")) {
       res.status(400).json({ message: err.message });
+    } else if (err.code === 'ENOENT') {
+      res.status(404).json({ message: 'Volume or directory not found' });
     } else {
       res.status(500).json({ message: err.message });
     }

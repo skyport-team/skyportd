@@ -1,4 +1,33 @@
 const path = require("path");
+const fs = require("fs").promises;
+
+/**
+ * Calculates the total size of a directory by recursively summing the sizes of all files.
+ * @param {string} dirPath - The path to the directory
+ * @returns {Promise<number>} The total size in bytes
+ */
+async function calculateDirectorySize(dirPath) {
+  let totalSize = 0;
+  
+  try {
+    const files = await fs.readdir(dirPath, { withFileTypes: true });
+
+    for (const file of files) {
+      const fullPath = path.join(dirPath, file.name);
+      if (file.isDirectory()) {;
+        totalSize += await calculateDirectorySize(fullPath);
+      } else {
+        const stats = await fs.stat(fullPath);
+        totalSize += stats.size;
+      }
+    }
+  } catch (err) {
+    console.error(`Error calculating size for ${dirPath}:`, err);
+    return 0;
+  }
+  
+  return totalSize;
+}
 
 /**
  * Determines the purpose of a file based on its extension.
@@ -161,4 +190,4 @@ function formatFileSize(bytes) {
   return `${size.toFixed(2)} ${units[unitIndex]}`;
 }
 
-module.exports = { getFilePurpose, isEditable, formatFileSize };
+module.exports = { getFilePurpose, isEditable, formatFileSize, calculateDirectorySize };
