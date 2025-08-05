@@ -146,7 +146,9 @@ const createContainerOptions = (config, volumePath) => ({
     Binds: [`${volumePath}:/app/data`],
     Memory: config.Memory * 1024 * 1024,
     CpuCount: config.Cpu,
-    NetworkMode: "host",
+    // On Windows, 'host' network mode doesn't work the same way as on Linux
+    // Using 'bridge' mode instead ensures proper port forwarding on Windows
+    NetworkMode: process.platform === "win32" ? "bridge" : "host",
   },
   Env: config.Env,
   ...(config.Cmd && { Cmd: config.Cmd }),
