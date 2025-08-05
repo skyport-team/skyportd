@@ -407,7 +407,12 @@ function initializeWebSocketServer(server) {
 
         containerLogs[containerId].push(logMessage);
 
-        ws.send(formatLogMessage(logMessage));
+        const formattedMessage = formatLogMessage(logMessage);
+        
+        // Rate limit check - only send if WebSocket is not buffering
+        if (ws.bufferedAmount === 0) {
+          ws.send(formattedMessage);
+        }
       });
 
       ws.on("close", () => {
@@ -417,9 +422,14 @@ function initializeWebSocketServer(server) {
     }
 
     // Helper function to format log messages
-    function formatLogMessage(logMessage) {
-      return `\r\n\u001b[34m[docker] \x1b[0m${logMessage.content}\r\n`;
-    }
+    const formatLogMessage = (logMessage) => {
+      const { content } = logMessage;
+      return content
+        .split('\n')
+        .filter(line => line.length > 0)
+        .map(line => `\r\n\u001b[34m[docker] \x1b[0m${line}\r\n`)
+        .join('');
+    };
 
     async function setupExecSession(ws, container) {
       streamDockerLogs(ws, container);
