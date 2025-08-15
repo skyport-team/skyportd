@@ -89,6 +89,23 @@ router.post('/create', async (req, res) => {
         if (Cmd) containerOptions.Cmd = Cmd;
         if (Env) containerOptions.Env = Env;
 
+        log.info(`Pulling image: ${Image}`);
+        try {
+          const stream = await docker.pull(Image);
+          await new Promise((resolve, reject) => {
+            docker.modem.followProgress(stream, (err, result) => {
+              if (err) {
+                return reject(new Error(`Failed to pull image: ${err.message}`));
+              }
+              log.info(`Image ${Image} pulled successfully.`);
+              resolve(result);
+            });
+          });
+        } catch (err) {
+          log.error(`Error pulling image ${Image}:`, err);
+          return res.status(500).json({ message: err.message });
+        }
+
         const container = await docker.createContainer(containerOptions);
         await container.start();
 

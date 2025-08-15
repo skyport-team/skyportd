@@ -32,9 +32,7 @@ const fs = require('node:fs');
 const path = require('path');
 const chalk = require('chalk')
 const ascii = fs.readFileSync('./handlers/ascii.txt', 'utf8');
-const { exec } = require('child_process');
 const { init, createVolumesFolder } = require('./handlers/init.js');
-const { seed } = require('./handlers/seed.js');
 const { start, createNewVolume } = require('./routes/InstanceFTP.js')
 const config = require('./config.json');
 
@@ -58,7 +56,6 @@ const log = new CatLoggr();
  */
 console.log(chalk.gray(ascii) + chalk.white(`version v${config.version}\n`));
 init();
-seed();
 
 app.use(bodyParser.json());
 app.use(basicAuth({
