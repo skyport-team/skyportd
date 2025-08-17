@@ -7,8 +7,10 @@ const fs = require('fs').promises;
 const path = require('path');
 
 async function init() {
-    // No longer used
-    log.init('init done')
+    log.init('initializing skyportd');
+    await createVolumesFolder();
+    await createStorageFolder();
+    log.init('init done');
 }
 
 async function createVolumesFolder() {
@@ -20,4 +22,13 @@ async function createVolumesFolder() {
   }
 }
 
-module.exports = { init, createVolumesFolder }
+async function createStorageFolder() {
+  try {
+    await fs.mkdir(path.join(__dirname, '../storage'), { recursive: true });
+    log.init('storage folder created successfully');
+  } catch (error) {
+    console.error('Error creating storage folder:', error);
+  }
+}
+
+module.exports = { init }

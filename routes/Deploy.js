@@ -33,10 +33,17 @@ const downloadFile = (url, dir, filename) => {
     });
 };
 
-const downloadInstallScripts = async (installScripts, dir) => {
+const downloadInstallScripts = async (installScripts, dir, variables = {}) => {
     for (const script of installScripts) {
         try {
-            await downloadFile(script.Uri, dir, script.Path);
+            // Replace variables in the URI before downloading
+            let uri = script.Uri;
+            for (const [key, value] of Object.entries(variables)) {
+                const regex = new RegExp(`{{${key}}}`, 'g');
+                uri = uri.replace(regex, value);
+            }
+            
+            await downloadFile(uri, dir, script.Path);
             log.info(`Successfully downloaded ${script.Path}`);
         } catch (err) {
             log.error(`Failed to download ${script.Path}: ${err.message}`);
@@ -45,25 +52,25 @@ const downloadInstallScripts = async (installScripts, dir) => {
 };
 
 const replaceVariables = async (dir, variables) => {
-    const files = await fs.readdir(dir);
-    for (const file of files) {
-        const filePath = path.join(dir, file);
-        const stats = await fs.stat(filePath);
-        if (stats.isFile() && !file.endsWith('.jar')) {
-            let content = await fs.readFile(filePath, 'utf8');
-            for (const [key, value] of Object.entries(variables)) {
-                const regex = new RegExp(`{{${key}}}`, 'g');
-                content = content.replace(regex, value);
-            }
-            await fs.writeFile(filePath, content, 'utf8');
-            log.info(`Variables replaced in ${file}`);
-        }
+  const files = await fs.readdir(dir);
+  for (const file of files) {
+    const filePath = path.join(dir, file);
+    const stats = await fs.stat(filePath);
+    if (stats.isFile() && !file.endsWith(".jar")) {
+      let content = await fs.readFile(filePath, "utf8");
+      for (const [key, value] of Object.entries(variables)) {
+        const regex = new RegExp(`{{${key}}}`, "g");
+        content = content.replace(regex, value);
+      }
+      await fs.writeFile(filePath, content, "utf8");
+      log.info(`Variables replaced in ${file}`);
     }
+  }
 };
 
 router.post('/create', async (req, res) => {
     log.info('deployment in progress...')
-    const { Image, Cmd, Env, Ports, Scripts, Memory, Cpu, PortBindings } = req.body;
+    const { Image, Cmd, Env, Ports, Scripts, Memory, Cpu, PortBindings, Variables } = req.body;
 
     try {
         let volumeId = new Date().getTime().toString();
@@ -82,7 +89,10 @@ router.post('/create', async (req, res) => {
                 PortBindings: PortBindings,
                 Binds: [`${volumePath}:/app/data`],
                 Memory: Memory * 1024 * 1024,
-                CpuCount: Cpu
+                CpuCount: Cpu,
+                // On Windows, 'host' network mode doesn't work the same way as on Linux
+                // Using 'bridge' mode instead ensures proper port forwarding on Windows
+                NetworkMode: process.platform === "win32" ? "bridge" : "host",
             }
         };
 
@@ -107,27 +117,30 @@ router.post('/create', async (req, res) => {
         }
 
         const container = await docker.createContainer(containerOptions);
-        await container.start();
 
         log.info('deployment completed! container: ' + container.id)
         res.status(201).json({ message: 'Container and volume created successfully', containerId: container.id, volumeId });
 
         if (Scripts && Scripts.Install && Array.isArray(Scripts.Install)) {
             const dir = path.join(__dirname, '../volumes', volumeId);
-            await downloadInstallScripts(Scripts.Install, dir);
-
-            // Prepare variables for replacement
+            
+            // Prepare variables for replacement (including user-provided variables)
             const variables = {
                 primaryPort: Object.values(PortBindings)[0][0].HostPort,
                 containerName: container.id.substring(0, 12),
                 timestamp: new Date().toISOString(),
-                randomString: Math.random().toString(36).substring(7)
+                randomString: Math.random().toString(36).substring(7),
+                ...(Variables || {})
             };
+
+            // Download install scripts with variable replacement
+            await downloadInstallScripts(Scripts.Install, dir, variables);
 
             // Replace variables in downloaded files
             await replaceVariables(dir, variables);
         }
 
+        await container.start();
     } catch (err) {
         log.error('deployment failed: ' + err)
         res.status(500).json({ message: err.message });
