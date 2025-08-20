@@ -151,6 +151,9 @@ async function init() {
 
       // moved here for be sure folder is created before loading routers
       loadRouters();
+    } else {
+      // For non-Windows systems, still load routers
+      loadRouters();
     }
   } catch (error) {
     log.error(
@@ -226,12 +229,9 @@ start();
 // Function to dynamically load routers
 function loadRouters() {
   const routesDir = path.join(__dirname, "routes");
-  fs.readdir(routesDir, (err, files) => {
-    if (err) {
-      log.error(`Error reading routes directory: ${err.message}`);
-      return;
-    }
-
+  try {
+    const files = fs.readdirSync(routesDir);
+    
     files.forEach((file) => {
       if (file.endsWith(".js")) {
         try {
@@ -249,7 +249,9 @@ function loadRouters() {
         }
       }
     });
-  });
+  } catch (err) {
+    log.error(`Error reading routes directory: ${err.message}`);
+  }
 }
 
 /**
