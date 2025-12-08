@@ -1,4 +1,4 @@
-const Docker = require("dockerode");
+const Docker = require("../Docker");
 const fs = require("fs");
 const path = require("path");
 const docker = new Docker({ socketPath: process.env.dockerSocket });
@@ -17,9 +17,10 @@ const deleteInstance = async (req, res) => {
   const container = docker.getContainer(req.params.id);
 
   try {
-    const { Name } = await container.inspect();
+    const info = await container.inspect();
+    const Name = info.Name;
     const nameWithoutSlash = Name.slice(0, 1) === "/" ? Name.slice(1) : Name;
-    const volumeDir = path.join(__dirname, "../volumes", nameWithoutSlash);
+    const volumeDir = path.join(__dirname, "../../volumes", nameWithoutSlash);
 
     await container.remove({ force: true });
     fs.rmSync(volumeDir, { force: true, recursive: true });

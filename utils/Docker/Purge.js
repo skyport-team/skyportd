@@ -1,4 +1,4 @@
-const Docker = require("dockerode");
+const Docker = require("../Docker");
 const fs = require("fs");
 const path = require("path");
 const docker = new Docker({ socketPath: process.env.dockerSocket });
@@ -19,9 +19,10 @@ const purgeAllInstances = async (req, res) => {
       const container = docker.getContainer(containerInfo.Id);
 
       try {
-        const { Name } = await container.inspect();
+        const info = await container.inspect();
+        const Name = info.Name;
         const nameWithoutSlash = Name.startsWith("/") ? Name.slice(1) : Name;
-        const volumeDir = path.join(__dirname, "../volumes", nameWithoutSlash);
+        const volumeDir = path.join(__dirname, "../../volumes", nameWithoutSlash);
         await container.remove({ force: true });
         if (fs.existsSync(volumeDir)) {
           fs.rmSync(volumeDir, { recursive: true, force: true });
@@ -35,7 +36,7 @@ const purgeAllInstances = async (req, res) => {
       }
     }
 
-    const volumesBaseDir = path.join(__dirname, "../volumes");
+    const volumesBaseDir = path.join(__dirname, "../../volumes");
     if (fs.existsSync(volumesBaseDir)) {
       const volumeFolders = fs.readdirSync(volumesBaseDir, {
         withFileTypes: true,

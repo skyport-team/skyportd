@@ -40,10 +40,8 @@ const { start } = require("./handlers/ftp.js");
 const config = require("./config.json");
 const statsLogger = require("./handlers/stats.js");
 
-const Docker2 = require("./utils/Docker");
-const Docker = require("dockerode");
+const Docker = require("./utils/Docker");
 
-const docker2 = new Docker2({ socketPath: process.env.dockerSocket });
 const docker = new Docker({ socketPath: process.env.dockerSocket });
 
 /**
@@ -65,7 +63,7 @@ const log = new CatLoggr();
 console.log(chalk.gray(ascii) + chalk.white(`version v${config.version}\n`));
 async function init() {
   try {
-    const ping = await docker2.ping();
+    const ping = await docker.ping();
     // not the best way to check if docker is running, but it works
     if (ping.includes("error: connect ENOENT")) {
       log.error("Docker is not running - skyportd will not function properly.");
@@ -189,7 +187,7 @@ startLoggingStats();
 app.get("/stats", async (req, res) => {
   try {
     const totalStats = statsLogger.getSystemStats.total();
-    const containers = await docker2.listContainers({ all: true });
+    const containers = await docker.listContainers({ all: true });
     //console.log("test ", containers);
     const onlineContainersCount = containers.filter(
       (container) => container.State === "running"

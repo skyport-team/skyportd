@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs-extra");
 const path = require("path");
-const Docker = require("dockerode");
+const Docker = require("../utils/Docker");
 
 const STRATEGIES_DIR = path.join(__dirname, "../storage/strategies");
 const FLAGGED_CONTAINERS_FILE = path.join(__dirname, "../storage/flagged.json");
 
-const docker = new Docker();
+const docker = new Docker({ socketPath: process.env.dockerSocket });
 let flaggedContainers = {};
 
 (async () => {
