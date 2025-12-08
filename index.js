@@ -438,6 +438,22 @@ function initializeWebSocketServer(server) {
     }
 
     async function setupStatsStreaming(ws, container, volumeId) {
+      // Read disk limit from states
+      const statesFilePath = path.join(__dirname, "storage/states.json");
+      let diskLimit = 0;
+      try {
+        if (fs.existsSync(statesFilePath)) {
+          const statesData = JSON.parse(fs.readFileSync(statesFilePath, "utf8"));
+          if (statesData[volumeId] && statesData[volumeId].diskLimit) {
+            diskLimit = statesData[volumeId].diskLimit;
+          }
+        }
+      } catch (err) {
+        log.warn("Failed to read disk limit from states:", err.message);
+      }
+
+      let hasAutoStopped = false; // Prevent multiple stop attempts
+
       const fetchStats = async () => {
         try {
           const stats = await new Promise((resolve, reject) => {
@@ -450,11 +466,32 @@ function initializeWebSocketServer(server) {
             });
           });
 
-          // Calculate volume size
+          // Calculate volume size (now returns MiB as string number)
           const volumeSize = await getVolumeSize(volumeId);
 
           // Add volume size to stats object
           stats.volumeSize = volumeSize;
+          stats.diskLimit = diskLimit;
+          
+          // Check if storage is exceeded (volumeSize is now a number string in MiB)
+          const volumeSizeMiB = parseFloat(volumeSize) || 0;
+          const storageExceeded = diskLimit > 0 && volumeSizeMiB >= diskLimit;
+          stats.storageExceeded = storageExceeded;
+
+          // Auto-stop container if storage exceeded and container is running
+          if (storageExceeded && !hasAutoStopped) {
+            const containerInfo = await container.inspect();
+            if (containerInfo.State.Running) {
+              log.warn(`Storage limit exceeded for volume ${volumeId}. Auto-stopping container.`);
+              hasAutoStopped = true;
+              try {
+                await container.stop();
+                ws.send(`\r\n\u001b[31m[skyportd] \x1b[0mServer stopped: storage limit exceeded (${volumeSizeMiB.toFixed(2)} MiB / ${diskLimit} MiB). Delete files or increase limit.\r\n`);
+              } catch (stopErr) {
+                log.error("Failed to auto-stop container:", stopErr.message);
+              }
+            }
+          }
 
           ws.send(JSON.stringify(stats));
         } catch (error) {
@@ -523,6 +560,32 @@ function initializeWebSocketServer(server) {
       }
 
       const containerId = container.id;
+      
+      // Check storage limit before start/restart
+      if (action === "start" || action === "restart") {
+        try {
+          const containerInfo = await container.inspect();
+          const volumeId = containerInfo.Name.replace(/^\//, "");
+          const statesFilePath = path.join(__dirname, "storage/states.json");
+          
+          if (fs.existsSync(statesFilePath)) {
+            const statesData = JSON.parse(fs.readFileSync(statesFilePath, "utf8"));
+            if (statesData[volumeId] && statesData[volumeId].diskLimit > 0) {
+              const volumePath = path.join(__dirname, "volumes", volumeId);
+              const volumeSize = await getVolumeSize(volumeId);
+              const volumeSizeMiB = parseFloat(volumeSize) || 0;
+              
+              if (volumeSizeMiB >= statesData[volumeId].diskLimit) {
+                ws.send(`\r\n\u001b[31m[skyportd] \x1b[0mCannot ${action}: storage limit exceeded (${volumeSizeMiB.toFixed(2)} MiB / ${statesData[volumeId].diskLimit} MiB). Delete files or increase your disk limit.\r\n`);
+                return;
+              }
+            }
+          }
+        } catch (checkErr) {
+          log.warn("Failed to check storage limit for power action:", checkErr.message);
+        }
+      }
+
       const timestamp = new Date().toISOString();
       const message = {
         timestamp: timestamp,
@@ -562,9 +625,10 @@ function initializeWebSocketServer(server) {
       const volumePath = path.join("./volumes", volumeId);
       try {
         const totalSize = await calculateDirectorySize(volumePath);
-        return formatBytes(totalSize);
+        // Return size in MiB as a number for easier frontend processing
+        return (totalSize / (1024 * 1024)).toFixed(2);
       } catch (err) {
-        return "Unknown";
+        return "0";
       }
     }
 

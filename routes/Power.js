@@ -8,8 +8,32 @@
 const express = require("express");
 const router = express.Router();
 const Docker = require("dockerode");
+const fs = require("fs");
+const path = require("path");
+const { calculateDirectorySize } = require("../utils/FileType");
 
 const docker = new Docker({ socketPath: process.env.dockerSocket });
+
+/**
+ * Reads the disk limit and volume ID association from states.json
+ */
+function getStateForContainer(containerId) {
+  const statesFilePath = path.join(__dirname, "../storage/states.json");
+  try {
+    if (fs.existsSync(statesFilePath)) {
+      const statesData = JSON.parse(fs.readFileSync(statesFilePath, "utf8"));
+      // Find the state entry that has this containerId
+      for (const [volumeId, state] of Object.entries(statesData)) {
+        if (state.containerId === containerId) {
+          return { volumeId, ...state };
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to read states:", err.message);
+  }
+  return null;
+}
 
 /**
  * POST /:id/:power
@@ -24,8 +48,33 @@ const docker = new Docker({ socketPath: process.env.dockerSocket });
  */
 router.post("/instances/:id/:power", async (req, res) => {
   const { power } = req.params;
-  const container = docker.getContainer(req.params.id);
+  const containerId = req.params.id;
+  const container = docker.getContainer(containerId);
+  
   try {
+    // Check storage limit before starting
+    if (power === "start" || power === "restart") {
+      const state = getStateForContainer(containerId);
+      if (state && state.diskLimit && state.diskLimit > 0) {
+        const volumePath = path.join(__dirname, "../volumes", state.volumeId);
+        try {
+          const currentSize = await calculateDirectorySize(volumePath);
+          const currentSizeMiB = currentSize / (1024 * 1024);
+          
+          if (currentSizeMiB >= state.diskLimit) {
+            return res.status(403).json({ 
+              message: "Cannot start server: storage limit exceeded. Please delete some files or increase your disk limit.",
+              currentUsageMiB: Math.round(currentSizeMiB),
+              limitMiB: state.diskLimit
+            });
+          }
+        } catch (sizeErr) {
+          // If we can't calculate size, allow start anyway
+          console.warn("Could not calculate volume size:", sizeErr.message);
+        }
+      }
+    }
+
     switch (power) {
       case "start":
       case "stop":
@@ -49,3 +98,4 @@ router.post("/instances/:id/:power", async (req, res) => {
 });
 
 module.exports = router;
+

@@ -39,9 +39,9 @@ const writeStates = async (states) => {
 };
 
 // Utility function to update state
-const updateState = async (volumeId, state, containerId = null) => {
+const updateState = async (volumeId, state, containerId = null, diskLimit = null) => {
   const states = await readStates();
-  states[volumeId] = { state, containerId };
+  states[volumeId] = { state, containerId, diskLimit };
   await writeStates(states);
 };
 
@@ -156,7 +156,7 @@ const createContainerOptions = (config, volumePath) => ({
 
 const createContainer = async (req, res) => {
   log.info("Deployment in progress...");
-  let { Image, Id, Cmd, Env, Ports, Scripts, Memory, Cpu, PortBindings } =
+  let { Image, Id, Cmd, Env, Ports, Scripts, Memory, Cpu, Disk, PortBindings } =
     req.body;
   let variables = req.body.variables || {};
 
@@ -202,7 +202,7 @@ const createContainer = async (req, res) => {
     ];
 
     // Update state to INSTALLING
-    await updateState(Id, "INSTALLING");
+    await updateState(Id, "INSTALLING", null, Disk || 0);
 
     log.info(`Pulling image: ${Image}`);
     try {
@@ -262,12 +262,12 @@ const createContainer = async (req, res) => {
     await container.start();
 
     // Update state to READY
-    await updateState(Id, "READY", container.id);
+    await updateState(Id, "READY", container.id, Disk || 0);
 
     log.info("Deployment completed successfully");
   } catch (err) {
     log.error("Deployment failed: " + err.message);
-    await updateState(Id, "FAILED");
+    await updateState(Id, "FAILED", null, Disk || 0);
   }
 };
 
@@ -330,7 +330,8 @@ const redeployContainer = async (req, res) => {
   const container = docker.getContainer(id);
   try {
     const { Idd } = req.params;
-    await updateState(Idd, "INSTALLING");
+    const { Disk } = req.body;
+    await updateState(Idd, "INSTALLING", null, Disk || 0);
     const containerInfo = await container.inspect();
     if (containerInfo.State.Running) {
       log.info(`Stopping container ${id}`);
@@ -377,7 +378,7 @@ const redeployContainer = async (req, res) => {
       message: "Container redeployed successfully",
       containerId: newContainer.id,
     });
-    await updateState(Idd, "READY", newContainer.id);
+    await updateState(Idd, "READY", newContainer.id, Disk || 0);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
