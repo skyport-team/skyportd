@@ -7,15 +7,15 @@ class Docker {
     this.socketPath = options.socketPath;
     this.baseUrl =
       process.platform === "win32"
-        ? "http://localhost/v1.41"
-        : `http://unix:${this.socketPath}:/v1.41`;
+        ? "http://localhost/v1.44"
+        : `http://unix:${this.socketPath}:/v1.44`;
   }
 
   _request(method, path, body = null, expectJson = true) {
     return new Promise((resolve, reject) => {
       const options = {
         socketPath: this.socketPath,
-        path: `/v1.41${path}`,
+        path: `/v1.44${path}`,
         method: method,
         headers: {
           "Content-Type": "application/json",
