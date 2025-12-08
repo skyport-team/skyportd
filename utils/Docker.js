@@ -167,7 +167,7 @@ class Docker {
   }
 
   /**
-   * Get a container object (Dockerode-compatible interface)
+   * Get a container object
    */
   getContainer(containerId) {
     return new Container(this, containerId);
@@ -239,7 +239,7 @@ class Docker {
   }
 
   /**
-   * Dockerode-compatible modem.followProgress
+   * Modem.followProgress
    */
   get modem() {
     const self = this;
@@ -290,7 +290,7 @@ class Docker {
 }
 
 /**
- * Container class - Dockerode-compatible interface
+ * Container class
  */
 class Container {
   constructor(docker, id) {
@@ -345,7 +345,7 @@ class Container {
   }
 
   /**
-   * Get container stats (callback style for Dockerode compatibility)
+   * Get container stats (callback style)
    */
   stats(options, callback) {
     if (typeof options === "function") {

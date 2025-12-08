@@ -83,76 +83,8 @@ async function init() {
 
     // Node Stats
     statsLogger.initLogger();
-
-    // Dockerode Fix for Windows
-    if (process.platform === "win32") {
-      const pnpmModemDir = path.join(
-        __dirname,
-        "node_modules",
-        ".pnpm",
-        "docker-modem@5.0.6",
-        "node_modules",
-        "docker-modem",
-        "lib"
-      );
-      const npmModemDir = path.join(
-        __dirname,
-        "node_modules",
-        "docker-modem",
-        "lib"
-      );
-
-      const modemDir = fs.existsSync(pnpmModemDir)
-        ? pnpmModemDir
-        : fs.existsSync(npmModemDir)
-        ? npmModemDir
-        : null;
-
-      if (!modemDir) {
-        log.error("Docker-modem directory not found. Cannot apply fix.");
-        return;
-      }
-
-      const modemPath = path.join(modemDir, "modem.js");
-      const lockFilePath = path.join(modemDir, "docker_modem_fix.lock");
-      const modemUrl =
-        "https://raw.githubusercontent.com/achul123/docker-modem/refs/heads/master/lib/modem.js";
-
-      try {
-        await fs2.mkdir(modemDir, { recursive: true });
-
-        if (!fs.existsSync(lockFilePath)) {
-          log.info("Fixing docker-modem for windows...");
-
-          const response = await fetch(modemUrl);
-          const data = await response.text();
-
-          await fs2.writeFile(modemPath, data);
-
-          // Create the lock file to prevent future executions
-          await fs2.writeFile(lockFilePath, "Docker-modem fix applied");
-          log.info("Docker-modem fix applied successfully");
-        }
-      } catch (error) {
-        log.error("Failed to apply docker-modem fix:", error.message);
-
-        if (error.code === "ENOENT") {
-          log.error("Detailed directory info:", {
-            pnpmModemDir,
-            npmModemDir,
-            modemDir,
-            modemPath,
-            lockFilePath,
-          });
-        }
-      }
-
-      // moved here for be sure folder is created before loading routers
-      loadRouters();
-    } else {
-      // For non-Windows systems, still load routers
-      loadRouters();
-    }
+    
+    loadRouters();
   } catch (error) {
     log.error(
       "failed to retrieve image list from remote! the panel might be down. error:",
