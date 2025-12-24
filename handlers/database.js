@@ -74,6 +74,48 @@ async function createDatabaseAndUser(dbName) {
   }
 }
 
+/**
+ * Deletes a MySQL database and user.
+ * @param {string} dbName - The name of the database to be deleted.
+ * @returns {Promise<boolean>} - True if successful.
+ */
+async function deleteDatabaseAndUser(dbName) {
+  let connection;
+  const userName = `user_${dbName}`;
+
+  if (!config.mysql || !config.mysql.host || !config.mysql.user) {
+    log.error("Invalid MySQL configuration:", config.mysql);
+    throw new Error("MySQL configuration is incomplete");
+  }
+
+  try {
+    connection = await mysql.createConnection({
+      host: config.mysql.host,
+      user: config.mysql.user,
+      password: config.mysql.password || "",
+    });
+
+    const deleteDbQuery = `DROP DATABASE IF EXISTS \`${dbName}\``;
+    const deleteUserQuery = `DROP USER IF EXISTS '${userName}'@'%'`;
+
+    await connection.query(deleteDbQuery);
+    log.info("Database deleted:", dbName);
+
+    await connection.query(deleteUserQuery);
+    log.info("User deleted:", userName);
+
+    return true;
+  } catch (err) {
+    log.error("MySQL Delete Error:", err);
+    throw err;
+  } finally {
+    if (connection) {
+      await connection.end();
+    }
+  }
+}
+
 module.exports = {
   createDatabaseAndUser,
+  deleteDatabaseAndUser,
 };

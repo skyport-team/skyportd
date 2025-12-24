@@ -69,4 +69,61 @@ router.get("/fs/:id/files", async (req, res) => {
   }
 });
 
+
+async function recursiveSearch(dir, query, baseDir) {
+  let results = [];
+  try {
+    const files = await fs.readdir(dir, { withFileTypes: true });
+
+    for (const file of files) {
+      const fullPath = path.join(dir, file.name);
+      if (file.isDirectory()) {
+        results = results.concat(await recursiveSearch(fullPath, query, baseDir));
+      } else {
+        if (file.name.toLowerCase().includes(query.toLowerCase())) {
+          const stats = await fs.stat(fullPath);
+          const relativePath = path.relative(baseDir, fullPath).replace(/\\/g, "/");
+          
+          results.push({
+            name: relativePath,
+            size: formatFileSize(stats.size),
+            lastUpdated: stats.mtime.toISOString(),
+            purpose: getFilePurpose(file.name),
+            isDirectory: false
+          });
+        }
+      }
+    }
+  } catch (err) {
+    console.error(`Error searching in ${dir}: ${err.message}`);
+  }
+  return results;
+}
+
+router.get("/fs/:id/search", async (req, res) => {
+  const volumeId = req.params.id;
+  const query = req.query.q;
+
+  if (!volumeId || !query) {
+    return res.status(400).json({ message: "Missing volume ID or query" });
+  }
+
+  const volumesPath = path.join(__dirname, "../volumes");
+  const volumePath = path.join(volumesPath, volumeId);
+
+  try {
+    await fs.access(volumePath);
+
+    const files = await recursiveSearch(volumePath, query, volumePath);
+
+    res.json({ files });
+  } catch (err) {
+    if (err.code === "ENOENT") {
+      res.status(404).json({ message: "Volume not found" });
+    } else {
+      res.status(500).json({ message: err.message });
+    }
+  }
+});
+
 module.exports = router;

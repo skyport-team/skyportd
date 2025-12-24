@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const fs = require("node:fs");
 
-const { createDatabaseAndUser } = require("../handlers/database.js");
+const { createDatabaseAndUser, deleteDatabaseAndUser } = require("../handlers/database.js");
 
 // FTP Route
 router.get("/ftp/info/:id", (req, res) => {
@@ -29,6 +29,17 @@ router.post("/database/create/:name", async (req, res) => {
   } catch (error) {
     console.error("Error creating database:", error);
     res.status(500).json({ error: "Failed to create database" });
+  }
+});
+
+router.delete("/database/delete/:name", async (req, res) => {
+  try {
+    const dbName = req.params.name;
+    await deleteDatabaseAndUser(dbName);
+    res.status(200).json({ message: `Database ${dbName} deleted successfully` });
+  } catch (error) {
+    console.error("Error deleting database:", error);
+    res.status(500).json({ error: "Failed to delete database" });
   }
 });
 
