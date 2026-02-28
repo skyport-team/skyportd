@@ -29,6 +29,14 @@ const deleteInstance = async (req, res) => {
       message: "Container and associated volume deleted successfully",
     });
   } catch (err) {
+    // Container already gone (404) — still clean up volume and return success
+    if (err.message && err.message.includes("404")) {
+      const volumeDir = path.join(__dirname, "../../volumes", req.params.id);
+      fs.rmSync(volumeDir, { force: true, recursive: true });
+      return res.json({
+        message: "Container already removed, cleaned up resources",
+      });
+    }
     res.status(500).json({ message: err.message });
   }
 };
