@@ -27,29 +27,8 @@ const getDirectories = async (srcPath) => {
   return directories.filter((dir) => dir !== null);
 };
 
-const generatePassword = (dirName) => {
-  const sumOfDigits = dirName
-    .split("")
-    .reduce((sum, char) => sum + (parseInt(char) || 0), 0);
-  const randomNumber = Math.floor(Math.random() * 900) + 10;
-  const otherRandomNumber = Math.floor(Math.random() * randomNumber) + 10;
-  const specialChars =
-    "!@#$%&*_?~AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
-
-  const replaceWithSpecialChar = () =>
-    specialChars[Math.floor(Math.random() * specialChars.length)];
-
-  const replacedString = (
-    sumOfDigits * Math.floor(randomNumber / otherRandomNumber)
-  )
-    .toString()
-    .replace(/[02481]/g, replaceWithSpecialChar);
-
-  const finalPassword = `${randomNumber}${replacedString}${
-    randomNumber * Math.floor(randomNumber / otherRandomNumber)
-  }`;
-
-  return finalPassword.replace(/[24557]/g, replaceWithSpecialChar);
+const generatePassword = () => {
+  return require("crypto").randomBytes(16).toString("base64url");
 };
 
 const createUserData = (username, password, dir) => ({
@@ -69,7 +48,7 @@ const createNewVolume = async (dir) => {
   try {
     await fs.access(userFile);
   } catch {
-    const password = generatePassword(dir);
+    const password = generatePassword();
     const userData = createUserData(username, password, dir);
 
     await fs.writeFile(userFile, JSON.stringify(userData, null, 2));
@@ -184,7 +163,7 @@ const createServer = () => {
 
     connection.on("command:pass", (pass, success, failure) => {
       if (currentUser) {
-        log.info(`Password attempt for user ${currentUser}: ${pass}`);
+        log.info(`Password attempt for user ${currentUser}`);
         const user = users[currentUser];
         if (user.password === pass) {
           success(currentUser);

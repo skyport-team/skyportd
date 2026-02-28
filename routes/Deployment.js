@@ -146,9 +146,9 @@ const createContainerOptions = (config, volumePath) => ({
     Binds: [`${volumePath}:/app/data`],
     Memory: config.Memory * 1024 * 1024,
     CpuCount: config.Cpu,
-    // On Windows, 'host' network mode doesn't work the same way as on Linux
-    // Using 'bridge' mode instead ensures proper port forwarding on Windows
-    NetworkMode: process.platform === "win32" ? "bridge" : "host",
+    // Always use 'bridge' mode to ensure proper network isolation
+    // 'host' mode shares the host network namespace — container escape risk
+    NetworkMode: "bridge",
   },
   Env: config.Env,
   ...(config.Cmd && { Cmd: config.Cmd }),

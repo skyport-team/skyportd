@@ -40,6 +40,14 @@ const { start } = require("./handlers/ftp.js");
 const config = require("./config.json");
 const statsLogger = require("./handlers/stats.js");
 
+const log = new CatLoggr();
+
+process.on("uncaughtException", (err) => {
+  log.error("Uncaught Exception:", err);
+});
+process.on("unhandledRejection", (reason) => {
+  log.error("Unhandled Rejection:", reason);
+});
 const Docker = require("./utils/Docker");
 
 const docker = new Docker({ socketPath: process.env.dockerSocket });
@@ -52,8 +60,6 @@ const docker = new Docker({ socketPath: process.env.dockerSocket });
  */
 const app = express();
 const server = http.createServer(app);
-
-const log = new CatLoggr();
 
 /**
  * Sets up Express application middleware for JSON body parsing and basic authentication using predefined
@@ -612,11 +618,6 @@ app.get("/", async (req, res) => {
       versionRelease: "skyportd " + config.version,
       online: true,
       remote: config.remote,
-      mysql: {
-        host: config.mysql.host,
-        user: config.mysql.user,
-        password: config.mysql.password,
-      },
       docker: {
         status: isDockerRunning ? "running" : "not running", // uhm, should keep it or not idk
         systemInfo: dockerInfo,

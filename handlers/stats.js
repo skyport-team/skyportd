@@ -7,7 +7,7 @@ const osut = require("os-utils");
 
 const storagePath = path.join(__dirname, "../storage/systemStats.json");
 const tempStoragePath = path.join(__dirname, "../storage/systemStats.tmp.json");
-const maxAge = 5 * 60 * 10000;
+const maxAge = 5 * 60 * 1000;
 let statsLog = [];
 
 function ensureStorageDirectory() {
