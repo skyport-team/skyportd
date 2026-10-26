@@ -19,6 +19,10 @@ function generatePassword() {
  * @returns {Promise<object>} - The database and user credentials.
  */
 async function createDatabaseAndUser(dbName) {
+  if (!/^[a-zA-Z0-9_]{1,32}$/.test(dbName)) {
+    throw new Error("Invalid database name: only alphanumeric characters and underscores allowed.");
+  }
+
   let connection;
   const userName = `user_${dbName}`;
   const password = generatePassword();
@@ -80,6 +84,10 @@ async function createDatabaseAndUser(dbName) {
  * @returns {Promise<boolean>} - True if successful.
  */
 async function deleteDatabaseAndUser(dbName) {
+  if (!/^[a-zA-Z0-9_]{1,32}$/.test(dbName)) {
+    throw new Error("Invalid database name: only alphanumeric characters and underscores allowed.");
+  }
+
   let connection;
   const userName = `user_${dbName}`;
 
