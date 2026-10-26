@@ -21,7 +21,8 @@ router.post("/fs/:id/files/create/:filename", async (req, res) => {
   const subPath = req.query.path || "";
 
   try {
-    const fullPath = safePath(path.join(volumePath, subPath), filename);
+    const targetRelativePath = path.join(subPath, filename);
+    const fullPath = safePath(volumePath, targetRelativePath);
 
     await fs.writeFile(fullPath, content);
     res.json({ message: "File created successfully" });

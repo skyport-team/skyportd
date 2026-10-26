@@ -18,7 +18,8 @@ router.delete("/fs/:id/files/delete/:filename", async (req, res) => {
   const subPath = req.query.path || "";
 
   try {
-    const filePath = safePath(path.join(volumePath, subPath), filename);
+    const targetRelativePath = path.join(subPath, filename);
+    const filePath = safePath(volumePath, targetRelativePath);
     const stats = await fs.lstat(filePath);
 
     if (stats.isDirectory()) {

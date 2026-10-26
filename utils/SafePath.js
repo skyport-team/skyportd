@@ -8,8 +8,10 @@ const path = require("path");
  * @throws {Error} If the resolved path attempts to escape the base directory.
  */
 function safePath(base, target) {
-  const fullPath = path.resolve(base, target);
-  if (!fullPath.startsWith(base)) {
+  const resolvedBase = path.resolve(base);
+  const fullPath = path.resolve(resolvedBase, target);
+  const relative = path.relative(resolvedBase, fullPath);
+  if (relative.startsWith("..") || path.isAbsolute(relative)) {
     throw new Error("Attempting to access outside of the volume");
   }
   return fullPath;
