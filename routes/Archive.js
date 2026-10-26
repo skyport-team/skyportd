@@ -6,6 +6,7 @@ const path = require("path");
 const archiver = require("archiver");
 const unzipper = require("unzipper");
 const mime = require("mime-types");
+const { safePath } = require("../utils/SafePath");
 
 /**
  * Formats file size into a human-readable string.
@@ -110,9 +111,12 @@ router.post("/archive/:id/archives/:volumeId/create", async (req, res) => {
  */
 router.get("/archive/:id/archives/download/:archiveName", async (req, res) => {
   const { id, archiveName } = req.params;
-  const archivePath = path.join(__dirname, "../archives", id, archiveName);
+  const safeId = path.basename(id);
+  const safeArchiveName = path.basename(archiveName);
+  const archiveDir = path.join(__dirname, "../archives", safeId);
 
   try {
+    const archivePath = safePath(archiveDir, safeArchiveName);
     await fsPromises.access(archivePath, fs.constants.F_OK);
 
     const mimeType = mime.lookup(archivePath) || "application/octet-stream";
@@ -140,9 +144,12 @@ router.get("/archive/:id/archives/download/:archiveName", async (req, res) => {
  */
 router.post("/archive/:id/archives/delete/:archiveName", async (req, res) => {
   const { id, archiveName } = req.params;
-  const archivePath = path.join(__dirname, "../archives", id, archiveName);
+  const safeId = path.basename(id);
+  const safeArchiveName = path.basename(archiveName);
+  const archiveDir = path.join(__dirname, "../archives", safeId);
 
   try {
+    const archivePath = safePath(archiveDir, safeArchiveName);
     await fsPromises.unlink(archivePath);
     res.json({ message: "Archive deleted successfully" });
   } catch (err) {
