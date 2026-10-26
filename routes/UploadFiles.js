@@ -63,7 +63,8 @@ router.post("/fs/:id/files/upload", upload.array("files"), async (req, res) => {
 
     await Promise.all(
       req.files.map((file) => {
-        const destPath = path.join(filePath, file.originalname);
+        const safeName = path.basename(file.originalname);
+        const destPath = safePath(filePath, safeName);
         return fs.rename(file.path, destPath);
       })
     );
