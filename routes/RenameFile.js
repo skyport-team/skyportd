@@ -20,8 +20,8 @@ router.post("/fs/:id/files/rename/:filename/:newfilename", async (req, res) => {
   const subPath = req.query.path || "";
 
   try {
-    const oldPath = safePath(path.join(volumePath, subPath), filename);
-    const newPath = safePath(path.join(volumePath, subPath), newfilename);
+    const oldPath = safePath(volumePath, path.join(subPath, filename));
+    const newPath = safePath(volumePath, path.join(subPath, newfilename));
 
     // Check if the new filename already exists
     try {
